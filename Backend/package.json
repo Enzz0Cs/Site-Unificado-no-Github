@@ -6,10 +6,10 @@
   "author": "",
   "type": "module",
   "main": "app.js",
-"scripts": {
-  "start": "node src/app.js",
-  "dev": "nodemon src/app.js",
-  "test": "echo \"Error: no test specified\" && exit 1"
+  "scripts": {
+    "start": "node --watch app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "cors": "^2.8.5",

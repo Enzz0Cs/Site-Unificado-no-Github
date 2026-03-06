@@ -12,8 +12,8 @@ class AnimalController {
             }
             res.json(animais);
         } catch (error) {
-            console.error('Erro ao listar animais:', error);
-            res.status(500).json({ error: 'Erro ao listar animais' });
+            console.error('ERRO NO BANCO (Animais):', error.message);
+            res.status(500).json({ error: 'Erro ao listar animais: ' + error.message });
         }
     }
 
@@ -26,7 +26,7 @@ class AnimalController {
             }
             res.json(animal);
         } catch (error) {
-            console.error('Erro ao buscar animal:', error);
+            console.error('Erro ao buscar animal:', error.message);
             res.status(500).json({ error: 'Erro ao buscar animal' });
         }
     }
@@ -35,7 +35,6 @@ class AnimalController {
         try {
             const { nome_animal, data_cadastro, sexo, raca, porte, idade } = req.body;
 
-            // Validação dos campos obrigatórios
             if (!nome_animal || !data_cadastro || !sexo || !raca || !porte || !idade) {
                 return res.status(400).json({
                     error: 'Todos os campos (Nome, Data de Cadastro, Sexo, Raça, Porte e Idade) devem ser preenchidos.'
@@ -48,21 +47,19 @@ class AnimalController {
                 dataCadastroSQL = `${ano}-${mes}-${dia}`;
             }
 
-            const dadosAnimal = {
+            const animal = await AnimalModel.criar({
                 nome_animal,
                 data_cadastro: dataCadastroSQL,
                 sexo,
                 raca,
                 porte,
                 idade
-            };
-
-            const animal = await AnimalModel.criar(dadosAnimal);
+            });
             res.status(201).json(animal);
 
         } catch (error) {
-            console.error('Erro ao criar cadastro do animal:', error);
-            res.status(500).json({ error: 'Erro ao criar cadastro do animal' });
+            console.error('Erro ao criar cadastro do animal:', error.message);
+            res.status(500).json({ error: 'Erro ao criar cadastro: ' + error.message });
         }
     }
 
@@ -73,7 +70,7 @@ class AnimalController {
 
             if (!nome_animal || !data_cadastro || !sexo || !raca || !porte || !idade) {
                 return res.status(400).json({
-                    error: 'Todos os campos (Nome, Data de Cadastro, Sexo, Raça, Porte e Idade) devem ser preenchidos.'
+                    error: 'Todos os campos devem ser preenchidos.'
                 });
             }
 
@@ -83,23 +80,22 @@ class AnimalController {
                 dataCadastroSQL = `${ano}-${mes}-${dia}`;
             }
 
-            const dadosAnimal = {
+            const animalAtualizado = await AnimalModel.atualizar(id, {
                 nome_animal,
                 data_cadastro: dataCadastroSQL,
                 sexo,
                 raca,
                 porte,
                 idade
-            };
+            });
 
-            const animalAtualizado = await AnimalModel.atualizar(id, dadosAnimal);
             if (!animalAtualizado) {
                 return res.status(404).json({ error: 'Animal não encontrado para atualização.' });
             }
 
             res.json(animalAtualizado);
         } catch (error) {
-            console.error('Erro ao atualizar animal:', error);
+            console.error('Erro ao atualizar animal:', error.message);
             res.status(500).json({ error: 'Erro ao atualizar animal' });
         }
     }
@@ -113,7 +109,7 @@ class AnimalController {
             }
             res.json({ message: 'Animal excluído com sucesso' });
         } catch (error) {
-            console.error('Erro ao excluir animal:', error);
+            console.error('Erro ao excluir animal:', error.message);
             res.status(500).json({ error: 'Erro ao excluir animal' });
         }
     }
