@@ -7,4 +7,5 @@ const ApiService = axios.create({
   }
 });
 
+// REMOVA o interceptor se ele estiver causando confusão agora e use apenas:
 export default ApiService;

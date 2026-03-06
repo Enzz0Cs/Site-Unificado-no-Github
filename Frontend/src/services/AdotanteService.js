@@ -1,5 +1,7 @@
 import axios from 'axios';
-const API_URL = 'http://localhost:3000/api/adotantes';
+
+// ALTERAÇÃO: Mudamos de 3000 para 3001 para conectar no seu Backend unificado
+const API_URL = 'http://localhost:3001/api/adotantes';
 
 class AdotanteService {
 
@@ -8,6 +10,7 @@ class AdotanteService {
      * @returns {Promise<Array>}
      */
     listar(termo = '') {
+        // Usamos o parâmetro 'busca' ou 'termo' conforme configurado no seu backend
         const url = termo ? `${API_URL}?termo=${termo}` : API_URL;
         return axios.get(url).then(response => response.data);
     }
@@ -18,8 +21,10 @@ class AdotanteService {
      */
     salvar(dados) {
         if (dados.AdotanteID) {
+            // Edição: Usa o ID existente
             return axios.put(`${API_URL}/${dados.AdotanteID}`, dados);
         } else {
+            // Cadastro: Remove o AdotanteID nulo para evitar erro de coluna no MySQL
             const { AdotanteID, ...dadosLimpos } = dados;
             return axios.post(API_URL, dadosLimpos);
         }
@@ -34,4 +39,5 @@ class AdotanteService {
     }
 }
 
+// Exportamos uma única instância para ser usada em todo o projeto
 export default new AdotanteService();

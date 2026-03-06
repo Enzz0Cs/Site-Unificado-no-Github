@@ -1,30 +1,45 @@
-import axios from 'axios';
+import ApiService from './ApiService.js';
 
-const API_URL = 'http://localhost:3001/api/animais';
+const ANIMAL_ENDPOINT = '/animais';
 
-class AnimalService {
-
-    listar(termo = '') {
-        const url = termo ? `${API_URL}?termo=${termo}` : API_URL;
-        return axios.get(url).then(response => response.data);
-    }
-
-    salvar(dados) {
-        if (dados.animal_id) {
-            return axios.put(`${API_URL}/${dados.animal_id}`, dados);
-        } else {
-            const { animal_id, ...dadosLimpos } = dados;
-            return axios.post(API_URL, dadosLimpos);
+const AnimalService = {
+    // Usamos funções normais em um objeto para facilitar o import no React
+    listar: async (termo = '') => {
+        try {
+            const url = termo ? `${ANIMAL_ENDPOINT}?termo=${termo}` : ANIMAL_ENDPOINT;
+            // O axios retorna um objeto, precisamos pegar a propriedade .data
+            const response = await ApiService.get(url);
+            return response.data || response;
+        } catch (error) {
+            throw error;
         }
-    }
-    
-    buscarPorId(id) {
-        return axios.get(`${API_URL}/${id}`).then(response => response.data);
-    }
+    },
 
-    excluir(id) {
-        return axios.delete(`${API_URL}/${id}`).then(response => response.data);
-    }
-}
+    salvar: async (dados) => {
+        try {
+            const id = dados.id || dados.animal_id;
+            if (id) {
+                const response = await ApiService.put(`${ANIMAL_ENDPOINT}/${id}`, dados);
+                return response.data || response;
+            } else {
+                const { id: _, animal_id: __, ...dadosLimpos } = dados;
+                const response = await ApiService.post(ANIMAL_ENDPOINT, dadosLimpos);
+                return response.data || response;
+            }
+        } catch (error) {
+            throw error;
+        }
+    },
 
-export default new AnimalService();
+    buscarPorId: async (id) => {
+        const response = await ApiService.get(`${ANIMAL_ENDPOINT}/${id}`);
+        return response.data || response;
+    },
+
+    excluir: async (id) => {
+        const response = await ApiService.delete(`${ANIMAL_ENDPOINT}/${id}`);
+        return response.data || response;
+    }
+};
+
+export default AnimalService;
