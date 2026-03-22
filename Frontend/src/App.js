@@ -7,7 +7,9 @@ import Home from './components/Home';
 import GerenciadorAbrigoAnimais from './components/GerenciadorAbrigoAnimais';
 import GerenciarVacinas from './components/GerenciarVacinas';
 import GerenciarAdotante from './components/GerenciarAdotante';
+import GerenciarEstoque from './components/GerenciarEstoque';
 import Login from './components/Login';
+
 
 // PROTEÇÃO
 import PrivateRoute from "./components/PrivateRoute";
@@ -67,6 +69,14 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route 
+ path="/estoque"
+ element={
+  <ProtectedRoute niveisPermitidos={["admin","funcionario"]}>
+    <GerenciarEstoque/>
+  </ProtectedRoute>
+ }
+/>
 
       </Routes>
 

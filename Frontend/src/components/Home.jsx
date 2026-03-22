@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaPaw, FaSyringe, FaUserFriends } from 'react-icons/fa';
+import { FaPaw, FaSyringe, FaUserFriends, FaBoxes } from 'react-icons/fa';
 import './EstilosAbrigo.css';
 
 const Home = () => {
@@ -46,7 +46,7 @@ const Home = () => {
 
                     {/* ANIMAIS */}
                     {(nivel === "admin" || nivel === "funcionario") && (
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                             <div className="card custom-card h-100 shadow p-4">
                                 <FaPaw size={50} color="#FF69B4" className="mx-auto mb-3" />
                                 <h3 className="custom-card-title border-0">Animais</h3>
@@ -60,7 +60,7 @@ const Home = () => {
 
                     {/* VACINAS */}
                     {(nivel === "admin" || nivel === "responsavel_tecnico") && (
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                             <div className="card custom-card h-100 shadow p-4">
                                 <FaSyringe size={50} color="#FF69B4" className="mx-auto mb-3" />
                                 <h3 className="custom-card-title border-0">Vacinas</h3>
@@ -74,12 +74,26 @@ const Home = () => {
 
                     {/* ADOTANTES */}
                     {(nivel === "admin" || nivel === "funcionario") && (
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                             <div className="card custom-card h-100 shadow p-4">
                                 <FaUserFriends size={50} color="#FF69B4" className="mx-auto mb-3" />
                                 <h3 className="custom-card-title border-0">Adotantes</h3>
                                 <p>Registro de interessados em adoção.</p>
                                 <Link to="/adotantes" className="btn custom-btn w-100 mt-3">
+                                    Gerenciar
+                                </Link>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ESTOQUE */}
+                    {(nivel === "admin" || nivel === "funcionario") && (
+                        <div className="col-md-3">
+                            <div className="card custom-card h-100 shadow p-4">
+                                <FaBoxes size={50} color="#FF69B4" className="mx-auto mb-3" />
+                                <h3 className="custom-card-title border-0">Estoque</h3>
+                                <p>Controle de materiais e insumos do abrigo.</p>
+                                <Link to="/estoque" className="btn custom-btn w-100 mt-3">
                                     Gerenciar
                                 </Link>
                             </div>

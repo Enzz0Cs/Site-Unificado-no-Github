@@ -7,6 +7,7 @@ import vacinaRoutes from './src/routes/vacinasRoutes.js';
 import adotanteRoutes from './src/routes/AdotanteRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
 import estoqueRoutes from './src/routes/estoqueRoutes.js';
+import historicoRoutes from './src/routes/historicoRoutes.js';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use('/api', vacinaRoutes);
 app.use('/api', adotanteRoutes);
 app.use('/api', authRoutes);
 app.use('/api', estoqueRoutes);
+app.use('/api', historicoRoutes);
 
 
 app.use((req, res) => {
