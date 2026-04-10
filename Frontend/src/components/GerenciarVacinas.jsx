@@ -6,19 +6,16 @@ import './EstilosAbrigo.css';
 import VacinaService from '../services/VacinaService';
 
 const GerenciarVacinas = () => {
-    // Inicializamos como array vazio para evitar o erro .map is not a function
     const [vacinas, setVacinas] = useState([]);
     const [formData, setFormData] = useState({ VacinaID: null, CodigoVacina: '', NomeVacina: '' });
     const [termoBusca, setTermoBusca] = useState('');
     const [mensagem, setMensagem] = useState({ tipo: '', texto: '' });
     const [isLoading, setIsLoading] = useState(false);
 
-    // Carregar dados do backend unificado na porta 3001
     const carregarVacinas = async (termo = '') => {
         setIsLoading(true);
         try {
             const dados = await VacinaService.listar(termo);
-            // Proteção extra: garante que o estado receba sempre um array
             setVacinas(Array.isArray(dados) ? dados : (dados?.data || []));
         } catch (error) {
             console.error("Erro ao carregar:", error);
@@ -30,8 +27,6 @@ const GerenciarVacinas = () => {
     };
 
     useEffect(() => { carregarVacinas(); }, []);
-
-    // Debounce para a busca não sobrecarregar o MySQL
     useEffect(() => {
         const timer = setTimeout(() => carregarVacinas(termoBusca), 500);
         return () => clearTimeout(timer);
@@ -40,13 +35,11 @@ const GerenciarVacinas = () => {
     const handleSalvar = async (e) => {
         e.preventDefault();
         try {
-            // LIMPEZA: Removemos o VacinaID se for nulo para evitar Erro 500 no MySQL
             const dadosParaEnviar = {
                 CodigoVacina: formData.CodigoVacina,
                 NomeVacina: formData.NomeVacina
             };
 
-            // Se houver ID, incluímos para realizar o PUT (edição)
             if (formData.VacinaID) {
                 dadosParaEnviar.VacinaID = formData.VacinaID;
             }
@@ -76,9 +69,8 @@ const GerenciarVacinas = () => {
 
     return (
         <Container className="mt-4 pb-5">
-            {/* Botão de Voltar para Home */}
             <header className="d-flex align-items-center mb-4 gap-3">
-                <Link to="/" className="btn btn-dark custom-btn-back" style={{ border: '1px solid #FF69B4' }}>
+                <Link to="/home" className="btn btn-dark custom-btn-back" style={{ border: '1px solid #FF69B4' }}>
                     <ArrowLeft size={20} color="#FF69B4" />
                 </Link>
                 <h2 className="custom-subtitle m-0">💉 Controle de Vacinação</h2>
@@ -90,7 +82,6 @@ const GerenciarVacinas = () => {
                 </Alert>
             )}
 
-            {/* Formulário de Cadastro */}
             <Card className="custom-card shadow-sm mb-5 border-0">
                 <Card.Header className="custom-navbar text-white">
                     <h5 className="m-0 custom-title text-white">

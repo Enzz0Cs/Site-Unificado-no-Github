@@ -3,7 +3,7 @@ import { Container, Form, Button, Row, Col, Table, Card, InputGroup, Alert } fro
 import { Edit, Trash2, Search, User, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import './EstilosAbrigo.css';
-import AdotanteService from '../services/AdotanteService'; // Importando seu serviço externo
+import AdotanteService from '../services/AdotanteService';
 
 function GerenciarAdotantes() {
   const [adotantes, setAdotantes] = useState([]);
@@ -24,11 +24,11 @@ function GerenciarAdotantes() {
 
   const [formData, setFormData] = useState(initialFormState);
 
-  // --- MÁSCARAS DE FORMATAÇÃO ---
+
   const mascaraCPF = (v) => v.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2').slice(0, 14);
   const mascaraTelefone = (v) => v.replace(/\D/g, '').replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3').slice(0, 15);
   const mascaraCEP = (v) => v.replace(/\D/g, '').replace(/(\d{5})(\d)/, '$1-$2').slice(0, 9);
-  const mascaraRG = (v) => v.replace(/[^0-9xX]/g, '').toUpperCase().slice(0, 12); // Aceita números e X
+  const mascaraRG = (v) => v.replace(/[^0-9xX]/g, '').toUpperCase().slice(0, 12);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -67,13 +67,13 @@ function GerenciarAdotantes() {
   const prepararEdicao = (adotante) => {
     setFormData(adotante);
     setEditando(true);
-    window.scrollTo(0, 0); // Sobe a tela para o formulário
+    window.scrollTo(0, 0);
   };
 
   return (
     <Container className="mt-4 pb-5">
       <header className="d-flex align-items-center mb-4 gap-3">
-        <Link to="/" className="btn btn-dark custom-btn-back" style={{ border: '1px solid #FF69B4' }}>
+        <Link to="/home" className="btn btn-dark custom-btn-back" style={{ border: '1px solid #FF69B4' }}>
           <ArrowLeft size={20} color="#FF69B4" />
         </Link>
         <h2 className="custom-subtitle m-0 d-flex align-items-center gap-2">

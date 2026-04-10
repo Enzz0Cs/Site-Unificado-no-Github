@@ -1,8 +1,5 @@
-/* Cores: Rosa (#FF69B4), Preto (#212529), Branco (#FFFFFF) */
-
-
 .custom-navbar {
-    background-color: #FF69B4; 
+    background-color: #FF69B4;
     color: #FFFFFF;
 }
 
@@ -13,7 +10,7 @@
 }
 
 .custom-btn {
-    background-color: #212529; 
+    background-color: #212529;
     border-color: #212529;
     color: #FFFFFF;
     font-weight: 600;
@@ -23,7 +20,7 @@
 .custom-btn:hover {
     background-color: #000000;
     border-color: #000000;
-    color: #FF69B4; 
+    color: #FF69B4;
 }
 
 .custom-subtitle {
@@ -32,7 +29,7 @@
 }
 
 .custom-card {
-    border: 1px solid #FF69B4; 
+    border: 1px solid #FF69B4;
     background-color: #FFFFFF;
 }
 
@@ -46,7 +43,7 @@
 .custom-delete-btn {
     background-color: #212529;
     border-color: #212529;
-    color: #FF69B4; 
+    color: #FF69B4;
     transition: background-color 0.3s;
 }
 
@@ -62,7 +59,7 @@
 }
 
 .custom-modal-header {
-    background-color: #212529; 
+    background-color: #212529;
     color: #FFFFFF;
     border-bottom: 1px solid #FF69B4;
 }
