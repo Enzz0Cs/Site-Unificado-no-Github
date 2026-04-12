@@ -1,0 +1,331 @@
+import React, { useEffect, useState } from 'react';
+import { Container, Form, Button, Row, Col, Table, Card, Alert } from 'react-bootstrap';
+import { Edit, Trash2, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import './EstilosAbrigo.css';
+
+import AnimalService from '../services/AnimalService.js';
+import ProcedimentoVeterinarioService from '../services/ProcedimentoVeterinarioService.js';
+
+const GerenciarProcedimentosVeterinarios = () => {
+  const [animais, setAnimais] = useState([]);
+  const [procedimentos, setProcedimentos] = useState([]);
+  const [mensagem, setMensagem] = useState({ tipo: '', texto: '' });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    ProcedimentoID: null,
+    animal_id: '',
+    tipo: '',
+    data_procedimento: '',
+    descricao: '',
+    veterinario: '',
+    situacao: 'Realizado',
+    confirmarDuplicidade: false
+  });
+
+  const carregarAnimais = async () => {
+    try {
+      const dados = await AnimalService.listar();
+      setAnimais(Array.isArray(dados) ? dados : []);
+    } catch (error) {
+      console.error('Erro ao carregar animais:', error);
+      setMensagem({ tipo: 'danger', texto: 'Erro ao carregar animais.' });
+    }
+  };
+
+  const carregarProcedimentos = async () => {
+    setIsLoading(true);
+    try {
+      const dados = await ProcedimentoVeterinarioService.listar();
+      setProcedimentos(Array.isArray(dados) ? dados : []);
+    } catch (error) {
+      console.error('Erro ao carregar procedimentos:', error);
+      setProcedimentos([]);
+      setMensagem({ tipo: 'danger', texto: 'Erro ao carregar procedimentos veterinários.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    carregarAnimais();
+    carregarProcedimentos();
+  }, []);
+
+  const limparFormulario = () => {
+    setFormData({
+      ProcedimentoID: null,
+      animal_id: '',
+      tipo: '',
+      data_procedimento: '',
+      descricao: '',
+      veterinario: '',
+      situacao: 'Realizado',
+      confirmarDuplicidade: false
+    });
+  };
+
+  const handleSalvar = async (e) => {
+    e.preventDefault();
+
+    try {
+      await ProcedimentoVeterinarioService.salvar(formData);
+
+      setMensagem({
+        tipo: 'success',
+        texto: formData.ProcedimentoID
+          ? 'Procedimento veterinário atualizado com sucesso!'
+          : 'Procedimento veterinário cadastrado com sucesso!'
+      });
+
+      limparFormulario();
+      carregarProcedimentos();
+    } catch (error) {
+      console.error('Erro ao salvar procedimento:', error);
+
+      if (error?.response?.status === 409 && error?.response?.data?.duplicidade) {
+        const confirmar = window.confirm(
+          'Já existe um procedimento semelhante para este animal na mesma data. Deseja gravar mesmo assim?'
+        );
+
+        if (confirmar) {
+          try {
+            await ProcedimentoVeterinarioService.salvar({
+              ...formData,
+              confirmarDuplicidade: true
+            });
+
+            setMensagem({
+              tipo: 'warning',
+              texto: 'Procedimento salvo com confirmação de duplicidade.'
+            });
+
+            limparFormulario();
+            carregarProcedimentos();
+            return;
+          } catch (novoErro) {
+            console.error('Erro ao confirmar duplicidade:', novoErro);
+          }
+        }
+
+        return;
+      }
+
+      setMensagem({
+        tipo: 'danger',
+        texto: error?.response?.data?.error || 'Erro ao salvar procedimento veterinário.'
+      });
+    }
+  };
+
+  const handleEditar = (procedimento) => {
+    setFormData({
+      ProcedimentoID: procedimento.ProcedimentoID,
+      animal_id: procedimento.animal_id,
+      tipo: procedimento.tipo,
+      data_procedimento: procedimento.data_procedimento?.split('T')[0] || procedimento.data_procedimento,
+      descricao: procedimento.descricao,
+      veterinario: procedimento.veterinario,
+      situacao: procedimento.situacao,
+      confirmarDuplicidade: false
+    });
+  };
+
+  const handleExcluir = async (id) => {
+    if (window.confirm('Deseja excluir este procedimento veterinário?')) {
+      try {
+        await ProcedimentoVeterinarioService.excluir(id);
+        setMensagem({ tipo: 'info', texto: 'Procedimento veterinário removido.' });
+        carregarProcedimentos();
+      } catch (error) {
+        console.error('Erro ao excluir procedimento:', error);
+        setMensagem({ tipo: 'danger', texto: 'Erro ao excluir procedimento veterinário.' });
+      }
+    }
+  };
+
+  return (
+    <Container className="py-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2>Controle de Procedimentos Veterinários</h2>
+        <Link to="/home" className="btn btn-outline-secondary">
+          <ArrowLeft size={18} className="me-2" />
+          Voltar
+        </Link>
+      </div>
+
+      {mensagem.texto && (
+        <Alert
+          variant={mensagem.tipo}
+          dismissible
+          onClose={() => setMensagem({ tipo: '', texto: '' })}
+        >
+          {mensagem.texto}
+        </Alert>
+      )}
+
+      <Card className="shadow-sm mb-4">
+        <Card.Body>
+          <h5 className="mb-3">
+            {formData.ProcedimentoID ? 'Editar Procedimento Veterinário' : 'Novo Procedimento Veterinário'}
+          </h5>
+
+          <Form onSubmit={handleSalvar}>
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Animal *</Form.Label>
+                  <Form.Select
+                    value={formData.animal_id}
+                    onChange={(e) => setFormData({ ...formData, animal_id: e.target.value })}
+                    required
+                  >
+                    <option value="">Selecione um animal</option>
+                    {animais.map((animal) => (
+                      <option key={animal.id} value={animal.id}>
+                        {animal.nome_animal}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Tipo *</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Consulta, exame, cirurgia, tratamento..."
+                    value={formData.tipo}
+                    onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row className="mb-3">
+              <Col md={4}>
+                <Form.Group>
+                  <Form.Label>Data *</Form.Label>
+                  <Form.Control
+                    type="date"
+                    value={formData.data_procedimento}
+                    onChange={(e) => setFormData({ ...formData, data_procedimento: e.target.value })}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+
+              <Col md={4}>
+                <Form.Group>
+                  <Form.Label>Veterinário *</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={formData.veterinario}
+                    onChange={(e) => setFormData({ ...formData, veterinario: e.target.value })}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+
+              <Col md={4}>
+                <Form.Group>
+                  <Form.Label>Situação *</Form.Label>
+                  <Form.Select
+                    value={formData.situacao}
+                    onChange={(e) => setFormData({ ...formData, situacao: e.target.value })}
+                    required
+                  >
+                    <option value="Realizado">Realizado</option>
+                    <option value="Previsto">Previsto</option>
+                    <option value="Em andamento">Em andamento</option>
+                    <option value="Cancelado">Cancelado</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row className="mb-3">
+              <Col md={12}>
+                <Form.Group>
+                  <Form.Label>Descrição *</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    value={formData.descricao}
+                    onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <div className="d-flex gap-2">
+              <Button type="submit" variant="success">
+                Salvar
+              </Button>
+
+              {formData.ProcedimentoID && (
+                <Button type="button" variant="secondary" onClick={limparFormulario}>
+                  Cancelar
+                </Button>
+              )}
+            </div>
+          </Form>
+        </Card.Body>
+      </Card>
+
+      <Card className="shadow-sm">
+        <Card.Body>
+          <h5 className="mb-3">Procedimentos cadastrados</h5>
+
+          {isLoading ? (
+            <p>Carregando...</p>
+          ) : procedimentos.length > 0 ? (
+            <Table striped bordered hover responsive>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Animal</th>
+                  <th>Tipo</th>
+                  <th>Data</th>
+                  <th>Descrição</th>
+                  <th>Veterinário</th>
+                  <th>Situação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {procedimentos.map((p) => (
+                  <tr key={p.ProcedimentoID}>
+                    <td>#{p.ProcedimentoID}</td>
+                    <td>{p.nome_animal || p.animal_id}</td>
+                    <td>{p.tipo}</td>
+                    <td>{new Date(p.data_procedimento).toLocaleDateString('pt-BR')}</td>
+                    <td>{p.descricao}</td>
+                    <td>{p.veterinario}</td>
+                    <td>{p.situacao}</td>
+                    <td className="d-flex gap-2">
+                      <Button variant="warning" size="sm" onClick={() => handleEditar(p)}>
+                        <Edit size={16} />
+                      </Button>
+                      <Button variant="danger" size="sm" onClick={() => handleExcluir(p.ProcedimentoID)}>
+                        <Trash2 size={16} />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          ) : (
+            <p>Nenhum procedimento veterinário cadastrado.</p>
+          )}
+        </Card.Body>
+      </Card>
+    </Container>
+  );
+};
+
+export default GerenciarProcedimentosVeterinarios;

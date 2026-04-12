@@ -10,6 +10,7 @@ import GerenciarEstoque from './components/GerenciarEstoque';
 import Login from './components/Login';
 import PrivateRoute from "./components/PrivateRoute";
 import ProtectedRoute from './components/ProtectedRoute';
+import GerenciarProcedimentosVeterinarios from './components/GerenciarProcedimentosVeterinarios';
 
 function App() {
   return (
@@ -61,6 +62,12 @@ function App() {
             <ProtectedRoute niveisPermitidos={["admin", "funcionario"]}>
               <GerenciarEstoque />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/procedimentos-veterinarios"
+          element={
+            <GerenciarProcedimentosVeterinarios />
           }
         />
 
